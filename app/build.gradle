@@ -31,9 +31,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "version"
+    productFlavors{
+        free {
+            dimension "version"
+            applicationId "com.udacity.gradle.builditbigger.free"
+        }
+        paid {
+            dimension "version"
+            applicationId "com.udacity.gradle.builditbigger.paid"
+        }
+    }
 }
 
 dependencies {
+    def espressoVersion = "3.0.0"
+    def junitVersion = "4.12"
+    def runnerVersion = "1.0.0"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     endpointsServer project(path: ':backend', configuration: 'endpoints')
     implementation 'com.android.support:appcompat-v7:26.1.0'
@@ -44,9 +60,15 @@ dependencies {
     implementation project(":jokeGenerateLib")
     implementation project(":jokeDisplayLib")
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+//    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    })
 
-    testImplementation 'junit:junit:4.12'
+
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$espressoVersion"
+
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "com.android.support.test:runner:$runnerVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espressoVersion"
 }

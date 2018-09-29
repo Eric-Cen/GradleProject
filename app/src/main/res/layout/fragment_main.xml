@@ -16,7 +16,6 @@
         android:text="@string/instructions" />
 
     <Button
-        android:id="@+id/bt_start_joke"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/instructions_text_view"
