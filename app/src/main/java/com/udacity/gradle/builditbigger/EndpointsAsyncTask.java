@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.util.Pair;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.eightmin4mile.jokedisplaylib.JokeDisplayActivity;
-import com.eightmin4mile.jokegeneratelib.JokeProvider;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -16,14 +15,13 @@ import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
 /**
  * Created by goandroid on 9/28/18.
  */
 
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, SimpleIdlingResource>, Void, String> {
 
+    private static final String TAG = "EndpointsAsyncTask";
 
     private static MyApi myApiService = null;
     private Context context;
@@ -56,20 +54,23 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, SimpleIdlingReso
             myApiService = builder.build();
         }
 
+        String result = "";
 
         try {
-            String result = myApiService.sayHi("whatever").execute().getData();
+            //result = myApiService.sayHi("whatever").execute().getData();
 
-            if (idlingResource != null) {
-                idlingResource.setIdleState(true);
-            }
+            result = myApiService.tellJoke().execute().getData();
 
-            return result;
-
-            //return myApiService.tellJoke().execute().getData();
         } catch (IOException e){
-            return e.getMessage();
+            Log.d(TAG, "failed to get a joke:  " + e.getMessage());
+
         }
+
+        if (idlingResource != null) {
+            idlingResource.setIdleState(true);
+        }
+
+        return result;
     }
 
     @Override
