@@ -1,12 +1,7 @@
 package com.udacity.gradle.builditbigger;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
-import android.util.Log;
-
-import com.eightmin4mile.jokedisplaylib.JokeDisplayActivity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -19,21 +14,39 @@ import java.io.IOException;
  * Created by goandroid on 9/28/18.
  */
 
-public class EndpointsAsyncTask extends AsyncTask<Pair<Context, SimpleIdlingResource>, Void, String> {
+public class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
 
     private static final String TAG = "EndpointsAsyncTask";
 
     private static MyApi myApiService = null;
-    private Context context;
+
+    private Context mContext;
+    private SimpleIdlingResource mSimpleIdlingResource;
+    private OnEventListener<String> mCallback;
+    public  Exception mException;
+
+
+    public interface  OnEventListener<T> {
+        public void onSuccess (T object);
+        public void onFailure (Exception e);
+    }
+
+    public EndpointsAsyncTask(Context context,
+                              OnEventListener callback,
+                              SimpleIdlingResource simpleIdlingResource){
+
+        mContext = context;
+        mCallback = callback;
+        mSimpleIdlingResource = simpleIdlingResource;
+
+    }
 
 
     @Override
-    protected String doInBackground(Pair<Context, SimpleIdlingResource>[] pairs) {
+    protected String doInBackground(Void... voids) {
 
-        context = pairs[0].first;
-        SimpleIdlingResource idlingResource = pairs[0].second;
-        if(idlingResource != null){
-            idlingResource.setIdleState(false);
+        if(mSimpleIdlingResource != null){
+            mSimpleIdlingResource.setIdleState(false);
         }
 
         if(myApiService == null){ // Only do this once
@@ -62,12 +75,12 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, SimpleIdlingReso
             result = myApiService.tellJoke().execute().getData();
 
         } catch (IOException e){
-            Log.d(TAG, "failed to get a joke:  " + e.getMessage());
+            mException  = e;
 
         }
 
-        if (idlingResource != null) {
-            idlingResource.setIdleState(true);
+        if (mSimpleIdlingResource != null) {
+            mSimpleIdlingResource.setIdleState(true);
         }
 
         return result;
@@ -75,10 +88,12 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, SimpleIdlingReso
 
     @Override
     protected void onPostExecute(String result) {
-
-        Intent intent = new Intent(context,
-                JokeDisplayActivity.class);
-        intent.putExtra(JokeDisplayActivity.JOKE_EXTRA, result);
-        context.startActivity(intent);
+        if(mCallback != null){
+            if(mException == null){
+                mCallback.onSuccess(result);
+            } else {
+                mCallback.onFailure(mException);
+            }
+        }
     }
 }

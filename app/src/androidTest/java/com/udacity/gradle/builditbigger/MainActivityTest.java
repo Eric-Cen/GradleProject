@@ -17,6 +17,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 
 /**
  * Created by goandroid on 9/28/18.
@@ -47,13 +48,14 @@ public class MainActivityTest {
         onView(withText(mActivityRule.getActivity().getResources().getString(R.string.button_text)))
                 .perform(click());
 
-//        onView(withText(containsString("w")))
-//                .check(matches(isDisplayed()));
 
         onView(withId(R.id.tv_display_joke)).check(matches(isDisplayed()));
 
+//        onView(withId(R.id.tv_display_joke))
+//                .check(matches(withText(containsString("Wh"))));
+
         onView(withId(R.id.tv_display_joke))
-                .check(matches(withText(containsString("Wh"))));
+                .check(matches(not(withText(""))));
     }
 
 }
